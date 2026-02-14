@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { View } from '../types';
+import { View, User } from '../types';
 
 interface SidebarProps {
   currentView: View;
   setView: (view: View) => void;
+  user: User;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, user }) => {
   const menuItems = [
     { id: View.DASHBOARD, label: 'Studio HUB', icon: 'fa-house' },
     { id: View.STUDIO, label: 'Production', icon: 'fa-clapperboard' },
@@ -22,11 +23,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
     { id: View.SETTINGS, label: 'System Prefs', icon: 'fa-sliders' },
   ];
 
+  if (user.isAdmin) {
+    adminItems.push({ id: View.ADMIN, label: 'Mainframe', icon: 'fa-user-ninja' });
+  }
+
   return (
-    <aside className="w-72 glass border-r border-slate-800 hidden md:flex flex-col h-screen sticky top-0 z-50">
+    <aside className="w-72 glass border-r border-slate-800 hidden md:flex flex-col h-screen sticky top-0 z-50 shadow-2xl">
       <div className="p-8 flex-1 flex flex-col gap-12 overflow-y-auto no-scrollbar">
         <div className="space-y-4">
-          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] mb-6 ml-4">Creative Base</p>
+          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] mb-6 ml-4">Core Workflow</p>
           <nav className="space-y-2">
             {menuItems.map((item) => (
               <button
@@ -46,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
         </div>
 
         <div className="space-y-4">
-          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] mb-6 ml-4">Terminal</p>
+          <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] mb-6 ml-4">Infrastructure</p>
           <nav className="space-y-2">
             {adminItems.map((item) => (
               <button
@@ -71,15 +76,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView }) => {
           onClick={() => setView(View.PROFILE)}
           className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-[2.5rem] p-7 border border-slate-800 relative overflow-hidden group cursor-pointer hover:border-orange-500/40 transition-all shadow-3xl"
         >
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500"></div>
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500 shadow-[0_0_10px_#f97316]"></div>
           <div className="space-y-4">
              <div className="flex justify-between items-center">
-                <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Active Plan</p>
+                <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Global Status</p>
                 <i className="fa-solid fa-bolt-lightning text-orange-500 text-[10px] animate-pulse"></i>
              </div>
              <div>
-                <p className="text-2xl font-black text-white">Founder <span className="text-orange-500">Pro</span></p>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">₹99/week • Priority GPU</p>
+                <p className="text-2xl font-black text-white">{user.plan} <span className="text-orange-500">PRO</span></p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">₹99/week • {user.credits} Credits</p>
              </div>
           </div>
         </div>

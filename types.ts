@@ -81,8 +81,21 @@ export interface Notification {
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string;
+  phone?: string;
   credits: number;
   plan: 'FREE' | 'WEEKLY' | 'PRO';
   isLoggedIn: boolean;
+  isAdmin?: boolean;
+  avatar?: string;
+  authMethod?: 'email' | 'google' | 'otp';
+}
+
+export interface Job {
+  id: string;
+  userId: string;
+  status: JobStatus;
+  type: OutputType;
+  timestamp: number;
+  prompt: string;
 }

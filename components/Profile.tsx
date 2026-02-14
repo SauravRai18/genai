@@ -1,29 +1,34 @@
 
 import React from 'react';
+import { User } from '../types';
 
 interface ProfileProps {
-  isSubscribed: boolean;
+  // Correctly define props to match App.tsx usage
+  user: User;
 }
 
-const Profile: React.FC<ProfileProps> = ({ isSubscribed }) => {
+const Profile: React.FC<ProfileProps> = ({ user }) => {
+  // Derive subscription status from user plan
+  const isSubscribed = user.plan !== 'FREE';
+
   return (
     <div className="space-y-12 max-w-4xl animate-fadeIn">
       <header className="flex flex-col md:flex-row items-center gap-8 bg-slate-900/50 p-10 rounded-[3rem] border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 blur-3xl rounded-full -mr-32 -mt-32 pointer-events-none"></div>
         <div className="relative">
           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-4xl font-black text-white shadow-2xl ring-8 ring-slate-950/50">
-            BA
+            {user.name.split(' ').map(n => n[0]).join('')}
           </div>
           <button className="absolute bottom-0 right-0 w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
             <i className="fa-solid fa-camera text-sm text-slate-400"></i>
           </button>
         </div>
         <div className="text-center md:text-left flex-1">
-          <h2 className="text-3xl font-black mb-2">Bharat <span className="text-orange-500">Creator</span></h2>
-          <p className="text-slate-400 font-medium mb-4">creator@bharat.ai • Premium Studio Member</p>
+          <h2 className="text-3xl font-black">{user.name.split(' ')[0]} <span className="text-orange-500">{user.name.split(' ')[1] || 'Creator'}</span></h2>
+          <p className="text-slate-400 font-medium mb-4">{user.email} • {isSubscribed ? 'Premium Studio Member' : 'Guest Member'}</p>
           <div className="flex flex-wrap gap-2 justify-center md:justify-start">
             <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
-              {isSubscribed ? 'Startup Pro' : 'Free Member'}
+              {isSubscribed ? `${user.plan} Pro` : 'Free Member'}
             </span>
             <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Elite Verified</span>
           </div>
@@ -79,6 +84,10 @@ const Profile: React.FC<ProfileProps> = ({ isSubscribed }) => {
               </div>
             )}
             <div className="pt-4 border-t border-slate-800 flex flex-col gap-3">
+              <div className="flex justify-between text-xs mb-2">
+                 <span className="text-slate-500 font-bold uppercase tracking-widest">Available Credits</span>
+                 <span className="text-orange-500 font-black">{user.credits}</span>
+              </div>
               <button className="w-full py-3 bg-orange-500 text-white font-black rounded-xl text-[10px] uppercase tracking-widest shadow-lg shadow-orange-900/20">
                 Manage Subscription
               </button>

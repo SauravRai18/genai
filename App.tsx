@@ -13,6 +13,7 @@ import Settings from './components/Settings';
 import LandingPage from './components/LandingPage';
 import AuthView from './components/AuthView';
 import PaymentView from './components/PaymentView';
+import AdminPanel from './components/AdminPanel';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(View.LANDING);
@@ -24,9 +25,10 @@ const App: React.FC = () => {
     id: 'user-001',
     name: 'Bharat Creator',
     email: 'creator@bharat.ai',
-    credits: 2,
+    credits: 0,
     plan: 'FREE',
-    isLoggedIn: false
+    isLoggedIn: false,
+    isAdmin: false
   });
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -59,12 +61,23 @@ const App: React.FC = () => {
     setNotifications(prev => [newNotification, ...prev].slice(0, 10));
   };
 
-  const handleAuthSuccess = () => {
-    setUser(prev => ({ ...prev, isLoggedIn: true }));
+  const handleAuthSuccess = (method: 'email' | 'google' | 'otp') => {
+    setUser(prev => ({ 
+      ...prev, 
+      isLoggedIn: true, 
+      authMethod: method,
+      credits: method === 'google' ? 2 : 1 // Google users get an extra freebie in this MVP demo
+    }));
+    
+    // Admins for specific emails for testing
+    if (user.email === 'admin@bharat.ai') {
+      setUser(prev => ({ ...prev, isAdmin: true }));
+    }
+
     setCurrentView(View.PAYMENT);
     addNotification({
-      title: 'Welcome!',
-      message: 'Account verified successfully.',
+      title: 'Identity Verified',
+      message: `Successfully authenticated via ${method.toUpperCase()}.`,
       type: 'success'
     });
   };
@@ -113,7 +126,7 @@ const App: React.FC = () => {
       case View.PAYMENT:
         return <PaymentView onPaymentSuccess={handlePaymentSuccess} />;
       case View.DASHBOARD:
-        return <Dashboard onNavigate={setCurrentView} recentGenerations={history} />;
+        return <Dashboard onNavigate={setCurrentView} recentGenerations={history} user={user} />;
       case View.STUDIO:
         return (
           <CreatorStudio 
@@ -122,6 +135,7 @@ const App: React.FC = () => {
             onSelectKey={handleSelectApiKey} 
             initialPrompt={selectedTemplatePrompt}
             onPromptUsed={() => setSelectedTemplatePrompt('')}
+            user={user}
           />
         );
       case View.LIVE:
@@ -136,8 +150,10 @@ const App: React.FC = () => {
         return <Analytics />;
       case View.SETTINGS:
         return <Settings />;
+      case View.ADMIN:
+        return <AdminPanel />;
       default:
-        return <Dashboard onNavigate={setCurrentView} recentGenerations={history} />;
+        return <Dashboard onNavigate={setCurrentView} recentGenerations={history} user={user} />;
     }
   };
 
@@ -145,13 +161,13 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-200 selection:bg-orange-500/30 overflow-hidden">
-      {showChrome && <Sidebar currentView={currentView} setView={setCurrentView} />}
+      {showChrome && <Sidebar currentView={currentView} setView={setCurrentView} user={user} />}
       
       <main className="flex-1 h-screen overflow-y-auto relative no-scrollbar">
         {showChrome && (
           <header className="sticky top-0 z-[60] glass border-b border-slate-800 px-8 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center font-black text-white text-xl">B</div>
+               <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center font-black text-white text-xl shadow-lg shadow-orange-950/20">B</div>
                <h1 className="text-xl font-extrabold hidden sm:block">BharatAI <span className="text-orange-500">Studio</span></h1>
             </div>
             
@@ -159,15 +175,15 @@ const App: React.FC = () => {
               <div className="hidden lg:flex flex-col items-end mr-4">
                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Plan</span>
                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span className="text-xs font-bold">{user.plan} CREATOR (₹99/wk)</span>
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_5px_#10b981]"></span>
+                    <span className="text-xs font-bold uppercase">{user.plan} CREATOR</span>
                  </div>
               </div>
 
               <div className="relative">
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className={`w-11 h-11 rounded-full bg-slate-900 border flex items-center justify-center transition-all ${notifications.some(n => !n.read) ? 'border-orange-500 text-orange-500' : 'border-slate-800 text-slate-400'}`}
+                  className={`w-11 h-11 rounded-full bg-slate-900 border flex items-center justify-center transition-all ${notifications.some(n => !n.read) ? 'border-orange-500 text-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.2)]' : 'border-slate-800 text-slate-400'}`}
                 >
                   <i className="fa-solid fa-bell"></i>
                   {notifications.some(n => !n.read) && (
@@ -203,7 +219,7 @@ const App: React.FC = () => {
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Credits</span>
                     <span className="text-xs font-black text-orange-500">{user.credits} Remaining</span>
                  </div>
-                 <button onClick={() => setCurrentView(View.PROFILE)} className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center">
+                 <button onClick={() => setCurrentView(View.PROFILE)} className="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-colors">
                     <i className="fa-solid fa-user text-xs"></i>
                  </button>
               </div>
