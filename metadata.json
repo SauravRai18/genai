@@ -1,0 +1,7 @@
+{
+  "name": "BharatAI Creator Studio",
+  "description": "Premium high-performance AI platform for Indian creators to generate 9:16 viral vertical reels and native Hinglish voiceovers.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
