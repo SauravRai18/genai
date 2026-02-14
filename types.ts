@@ -8,10 +8,12 @@ export interface EngineStep {
 export type JobStatus = 'queued' | 'processing' | 'synthesizing' | 'completed' | 'failed';
 
 export interface Scene {
+  id: string;
   description: string;
   camera: string;
   lighting: string;
   duration: string;
+  subject: string;
 }
 
 export interface EngineBreakdown {
@@ -55,7 +57,8 @@ export enum View {
   PROFILE = 'PROFILE',
   SETTINGS = 'SETTINGS',
   ANALYTICS = 'ANALYTICS',
-  TRENDING = 'TRENDING'
+  TRENDING = 'TRENDING',
+  ADMIN = 'ADMIN'
 }
 
 export interface Template {
@@ -72,4 +75,14 @@ export interface Notification {
   message: string;
   time: string;
   read: boolean;
+  type: 'success' | 'info' | 'error';
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  credits: number;
+  plan: 'FREE' | 'WEEKLY' | 'PRO';
+  isLoggedIn: boolean;
 }
